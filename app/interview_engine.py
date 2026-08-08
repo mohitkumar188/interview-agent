@@ -5,13 +5,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Groq API initialization (OpenAI compatible)
-api_key = os.getenv("GROQ_API_KEY")
-client = OpenAI(
-    base_url="https://api.groq.com/openai/v1",
-    api_key=api_key
-) if api_key else None
-
 CURRICULUM_PATH = os.path.join(os.path.dirname(__file__), "data", "curriculum.json")
 
 def load_curriculum():
@@ -26,11 +19,17 @@ def load_curriculum():
 CURRICULUM = load_curriculum()
 
 def process_interview_turn(session: dict, user_message: str = None) -> dict:
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         return {
             "done": False,
-            "reply": "Error: GROQ_API_KEY is missing in .env file."
+            "reply": "Error: GROQ_API_KEY environment variable is not configured."
         }
+
+    client = OpenAI(
+        base_url="https://api.groq.com/openai/v1",
+        api_key=api_key
+    )
 
     if user_message:
         session["history"].append({"role": "user", "content": user_message})
